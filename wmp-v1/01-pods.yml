@@ -13,7 +13,7 @@ metadata:
   name: auth-service
 spec:
   containers:
-  - name: frontend
+  - name: auth-service
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/auth-service
 ---
 apiVersion: v1
@@ -22,7 +22,7 @@ metadata:
   name: analytics-service
 spec:
   containers:
-  - name: frontend
+  - name: analytics-service
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/analytics-service
 ---
 apiVersion: v1
@@ -31,6 +31,6 @@ metadata:
   name: portfolio-service
 spec:
   containers:
-  - name: frontend
+  - name: portfolio-service
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/portfolio-service
 
