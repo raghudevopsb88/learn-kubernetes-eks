@@ -20,16 +20,6 @@ spec:
             configMapKeyRef:
               name: game-demo
               key: player_initial_lives
-        - name: score
-          valueFrom:
-            configMapKeyRef:
-              name: game-demo
-              key: score
-        - name: name
-          valueFrom:
-            configMapKeyRef:
-              name: game-demo
-              key: name
 ---
 apiVersion: v1
 kind: Pod
