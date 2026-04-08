@@ -1,5 +1,6 @@
 ## Problems that we have in 02.yml
 # 1. A lot of environment hardcoding to yaml file is challenge, Image having 200 inputs.
+# Solution here is use configmap and secrets. Secrets are not anyhow secrets, later we will use secret manager. For time being we will keep everything in configmap.
 
 apiVersion: v1
 kind: Pod
@@ -11,6 +12,22 @@ spec:
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/frontend
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+data:
+  DB_HOST: "wmp-dev.cbvsbeoyxek4.us-east-1.rds.amazonaws.com"
+  DB_PORT: "5432"
+  DB_USER: "auth_svc_user"
+  DB_PASSWORD: "localdev123"
+  DB_NAME: "wmp"
+  DB_SCHEMA: "auth_schema"
+  SERVER_PORT: "8081"
+  JWT_SECRET: "myDefaultSuperSecretKeyThatIsAtLeast256BitsLongForHS256Algorithm"
+  PORTFOLIO_SERVICE_URL: "http://localhost:8080"
+
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: auth-service
@@ -18,25 +35,21 @@ spec:
   containers:
   - name: auth-service
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/auth-service
-    env:
-      - name: DB_HOST
-        value: "wmp-dev.cbvsbeoyxek4.us-east-1.rds.amazonaws.com"
-      - name: DB_PORT
-        value: "5432"
-      - name: DB_USER
-        value: "auth_svc_user"
-      - name: DB_PASSWORD
-        value: "localdev123"
-      - name: DB_NAME
-        value: "wmp"
-      - name: DB_SCHEMA
-        value: "auth_schema"
-      - name: SERVER_PORT
-        value: "8081"
-      - name: JWT_SECRET
-        value: "myDefaultSuperSecretKeyThatIsAtLeast256BitsLongForHS256Algorithm"
-      - name: PORTFOLIO_SERVICE_URL
-        value: "http://localhost:8080"
+    envFrom:
+      - configMapRef:
+          name: auth-service-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: analytics-service-config
+data:
+  DATABASE_URL: "postgresql+asyncpg://analytics_svc_user:localdev123@wmp-dev.cbvsbeoyxek4.us-east-1.rds.amazonaws.com:5432/wmp"
+  DB_SCHEMA: "analytics_schema"
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "production"
+
 ---
 apiVersion: v1
 kind: Pod
@@ -46,15 +59,23 @@ spec:
   containers:
   - name: analytics-service
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/analytics-service
-    env:
-      - name: DATABASE_URL
-        value: "postgresql+asyncpg://analytics_svc_user:localdev123@wmp-dev.cbvsbeoyxek4.us-east-1.rds.amazonaws.com:5432/wmp"
-      - name: DB_SCHEMA
-        value: "analytics_schema"
-      - name: LOG_LEVEL
-        value: "INFO"
-      - name: ENVIRONMENT
-        value: "production"
+    envFrom:
+      - configMapRef:
+          name: analytics-service-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: portfolio-service-config
+data:
+  SPRING_PROFILES_ACTIVE: "production"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://wmp-dev.cbvsbeoyxek4.us-east-1.rds.amazonaws.com:5432/wmp?currentSchema=portfolio_schema"
+  SPRING_DATASOURCE_USERNAME: "portfolio_svc_user"
+  SPRING_DATASOURCE_PASSWORD: "localdev123"
+  JWT_SECRET: "myDefaultSuperSecretKeyThatIsAtLeast256BitsLongForHS256Algorithm"
+  SERVER_PORT: "8080"
+
 ---
 apiVersion: v1
 kind: Pod
@@ -64,21 +85,7 @@ spec:
   containers:
   - name: portfolio-service
     image: 739561048503.dkr.ecr.us-east-1.amazonaws.com/portfolio-service
-    env:
-      - name: SPRING_PROFILES_ACTIVE
-        value: production
-      - name: SPRING_DATASOURCE_URL
-        value: "jdbc:postgresql://wmp-dev.cbvsbeoyxek4.us-east-1.rds.amazonaws.com:5432/wmp?currentSchema=portfolio_schema"
-      - name: SPRING_DATASOURCE_USERNAME
-        value: portfolio_svc_user
-      - name: SPRING_DATASOURCE_PASSWORD
-        value: localdev123
-      - name: JWT_SECRET
-        value: myDefaultSuperSecretKeyThatIsAtLeast256BitsLongForHS256Algorithm
-      - name: SERVER_PORT
-        value: "8080"
+    envFrom:
+      - configMapRef:
+          name: portfolio-service-config
 
-## Problems that we foresee now are
-# 1. A lot of environment hardcoding to yaml file is challenge, Image having 200 inputs. 
-# 2. Inter communication between the services is not there. 
-# 3. Access frontend from public is also not there 
