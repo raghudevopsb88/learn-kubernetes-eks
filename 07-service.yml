@@ -1,7 +1,10 @@
 # service in kubernetes
 # 1. Acts like a cluster internal load balancer, In case if we need to send the traffic to multipole pods then it is solution.
 # 2. Service when it creates, it also creates a DNS record in coredns in kubernetes cluster, where all the pods can access other services internally with name rather than relying on 3rd party DNS services.
-
+# When communicating
+#   If you are in same namespace - curl <service-name>
+#   If you are in different namespace - curl <service-name>.<namespace>
+#   If you are in different cluster - curl <service-name>.<namespace>.<clustername>
 
 apiVersion: v1
 kind: Pod
@@ -70,7 +73,6 @@ metadata:
 spec:
   type: ExternalName
   externalName: www.columbia.edu
-  #externalName: aa2f68314191a4ac78d894dbff0553e3-1237491508.us-east-1.elb.amazonaws.com
 
 
 
