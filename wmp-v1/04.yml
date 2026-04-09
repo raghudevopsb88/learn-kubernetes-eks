@@ -1,6 +1,8 @@
 ## Problems that we have in 02.yml
-# 1. A lot of environment hardcoding to yaml file is challenge, Image having 200 inputs.
-# Solution here is use configmap and secrets. Secrets are not anyhow secrets, later we will use secret manager. For time being we will keep everything in configmap.
+# 2. Inter communication between the services is not there.
+##  Solution: Added service to communicate internally
+# 3. Access frontend from public is also not there
+##  Solution: Added service with type LoadBalancer to Solve the problem
 
 apiVersion: v1
 kind: Pod
@@ -146,3 +148,7 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+
+## Problems that we foresee now are
+# 1. Availability of pods is a problem, Since a single pod is running we anticipate availability problem
+
