@@ -185,4 +185,5 @@ spec:
 
 ## Problems that we foresee
 # 1. Code DRY practice, For every component we are giving a saperate yaml code, Which over a period of time, it become tedious to manage them.
+## Solution
 
